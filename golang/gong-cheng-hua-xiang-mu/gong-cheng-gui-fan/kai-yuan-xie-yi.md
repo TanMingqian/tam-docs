@@ -14,7 +14,7 @@ Lesser General Public Licence，是 GPL 的一个为主要为类库使用设计�
 
 ### Apache
 
-&#x20;Apache 协议是 Apache 软件基金会发布的一个自由软件许可证，Apache 2.0 协议除了为用户提供版权许可之外，还有专利许可，非常适合涉及专利内容的项目。
+Apache 协议是 Apache 软件基金会发布的一个自由软件许可证，Apache 2.0 协议除了为用户提供版权许可之外，还有专利许可，非常适合涉及专利内容的项目。
 
 ### BSD
 
@@ -24,7 +24,7 @@ BSD（Berkeley Software Distribution，伯克利软件发行版）。BSD 协议�
 
 MIT协议的主要内容为：该软件及其相关文档对所有人免费，可以任意处置，包括使用，复制，修改，合并，发表，分发，再授权，或者销售。唯一的限制是，软件中必须包含上述版权和许可提示。MIT 协议是所有开源许可中最宽松的一个，除了必须包含许可声明外，再无任何限制。
 
-![](<../../.gitbook/assets/image (5).png>)
+![](<../../../.gitbook/assets/image (5) (1).png>)
 
 
 
