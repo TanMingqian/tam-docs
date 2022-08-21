@@ -4,7 +4,7 @@
 
 ## Kubernetes
 
-* [Kubernetes 安装](kubernetes/kubernetes-an-zhuang/README.md)
+* [Kubernetes 安装](the-company/vision-and-values.md)
   * [K8s 1.20kubeadm安装](kubernetes/kubernetes-an-zhuang/k8s-1.20kubeadm-an-zhuang.md)
   * [K8s 1.21.1 kind安装](kubernetes/kubernetes-an-zhuang/k8s-1.21.1-kind-an-zhuang.md)
   * [Kubernetes dashboard 安装](kubernetes/kubernetes-an-zhuang/kubernetes-dashboard-an-zhuang.md)
@@ -15,5 +15,5 @@
 
 ## DevOps
 
-* [Requesting Time Off](devops/requesting-time-off.md)
-* [Filing Expenses](devops/filing-expenses.md)
+* [Requesting Time Off](the-formal-stuff/requesting-time-off.md)
+* [Filing Expenses](the-formal-stuff/filing-expenses.md)
