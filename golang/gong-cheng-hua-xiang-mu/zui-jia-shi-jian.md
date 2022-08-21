@@ -1,18 +1,18 @@
 # 最佳实践
 
-![](<../../.gitbook/assets/image (30).png>)
+![](<../../.gitbook/assets/image (30) (1).png>)
 
 
 
 **用“最佳实践”的方式去实现 Go 项目中的 Go 应用、项目管理和项目文档**
 
-![](<../../.gitbook/assets/image (4).png>)
+![](<../../.gitbook/assets/image (4) (1).png>)
 
 
 
 ## 编写高质量go应用
 
-![](../../.gitbook/assets/image.png)
+![](<../../.gitbook/assets/image (39).png>)
 
 ## 高效项目管理
 

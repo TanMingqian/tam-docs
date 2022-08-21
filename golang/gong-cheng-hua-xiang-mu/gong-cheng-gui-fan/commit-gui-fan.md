@@ -2,9 +2,9 @@
 
 ## Angular 规范
 
-![](<../../../.gitbook/assets/image (18).png>)
+![](<../../../.gitbook/assets/image (18) (1).png>)
 
-![](<../../../.gitbook/assets/image (3).png>)
+![](<../../../.gitbook/assets/image (3) (1).png>)
 
 **在 Angular 规范中，Commit Message 包含三个部分，分别是 Header、Body 和 Footer，格式如下：**
 
@@ -44,7 +44,7 @@ type，它用来说明 commit 的类型。为了方便记忆，我把这些类�
 
 **Production**：这类修改会影响最终的用户和生产环境的代码。所以对于这种改动，我们一定要慎重，并在提交前做好充分的测试。
 
-![](<../../../.gitbook/assets/image (23).png>)
+![](<../../../.gitbook/assets/image (23) (1).png>)
 
 ![](<../../../.gitbook/assets/image (19).png>)
 
@@ -83,7 +83,7 @@ Fixes #<issue number>
 
 git rebase -i 使用 git rebase 命令，-i 参数表示交互（interactive），该命令会进入到一个交互界面中
 
-![](<../../../.gitbook/assets/image (7).png>)
+![](<../../../.gitbook/assets/image (7) (2).png>)
 
 ### 修改 Commit Message
 

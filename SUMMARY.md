@@ -13,11 +13,6 @@
   * [Helm安装](kubernetes/kubernetes-an-zhuang/helm-an-zhuang.md)
   * [常见问题积累](kubernetes/kubernetes-an-zhuang/chang-jian-wen-ti-ji-lei.md)
 
-## DevOps
-
-* [Requesting Time Off](the-formal-stuff/requesting-time-off.md)
-* [Filing Expenses](the-formal-stuff/filing-expenses.md)
-
 ## GOLANG
 
 * [golang基础](golang/golang-ji-chu.md)
@@ -30,8 +25,16 @@
     * [commit规范](golang/gong-cheng-hua-xiang-mu/gong-cheng-gui-fan/commit-gui-fan.md)
     * [文档规范](golang/gong-cheng-hua-xiang-mu/gong-cheng-gui-fan/wen-dang-gui-fan.md)
   * [最佳实践](golang/gong-cheng-hua-xiang-mu/zui-jia-shi-jian.md)
-  * [设计](golang/gong-cheng-hua-xiang-mu/she-ji/README.md)
-    * [设计模式](golang/gong-cheng-hua-xiang-mu/she-ji/she-ji-mo-shi.md)
-    * [RESTful API](golang/gong-cheng-hua-xiang-mu/she-ji/restful-api.md)
-    * [RPC API](golang/gong-cheng-hua-xiang-mu/she-ji/rpc-api.md)
+  * [设计规范](golang/gong-cheng-hua-xiang-mu/she-ji-gui-fan/README.md)
+    * [设计模式](golang/gong-cheng-hua-xiang-mu/she-ji-gui-fan/she-ji-mo-shi.md)
+    * [RESTful API](golang/gong-cheng-hua-xiang-mu/she-ji-gui-fan/restful-api.md)
+    * [RPC API](golang/gong-cheng-hua-xiang-mu/she-ji-gui-fan/rpc-api.md)
+    * [Swagger](golang/gong-cheng-hua-xiang-mu/she-ji-gui-fan/swagger.md)
+    * [错误码设计](golang/gong-cheng-hua-xiang-mu/she-ji-gui-fan/cuo-wu-ma-she-ji.md)
+    * [错误包设计](golang/gong-cheng-hua-xiang-mu/she-ji-gui-fan/cuo-wu-bao-she-ji.md)
+    * [日志设计](golang/gong-cheng-hua-xiang-mu/she-ji-gui-fan/ri-zhi-she-ji.md)
+    * [基础应用框架](golang/gong-cheng-hua-xiang-mu/she-ji-gui-fan/ji-chu-ying-yong-kuang-jia.md)
+    * [go-web服务](golang/gong-cheng-hua-xiang-mu/she-ji-gui-fan/goweb-fu-wu.md)
+    * [权限模型](golang/gong-cheng-hua-xiang-mu/she-ji-gui-fan/quan-xian-mo-xing.md)
+    * [Makefile](golang/gong-cheng-hua-xiang-mu/she-ji-gui-fan/makefile.md)
 * [kratos框架](golang/kratos-kuang-jia.md)

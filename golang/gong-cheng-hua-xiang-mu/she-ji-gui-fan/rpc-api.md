@@ -6,7 +6,7 @@
 
 RPC **屏蔽了底层的网络通信细节**，使得开发人员无需关注网络编程的细节，可以将更多的时间和精力放在业务逻辑本身的实现上，从而提高开发效率。
 
-![](<../../../.gitbook/assets/image (1).png>)
+![](<../../../.gitbook/assets/image (1) (1).png>)
 
 ## RPC 调用具体流程
 
@@ -38,7 +38,7 @@ gRPC 是由 Google 开发的高性能、开源、跨多种编程语言的通用 
 
 • 支持 Protobuf 和 JSON 序列化数据格式。Protobuf 是一种语言无关的高性能序列化框架，可以减少网络传输流量，提高通信效率。
 
-![](<../../../.gitbook/assets/image (16).png>)
+![](<../../../.gitbook/assets/image (16) (1).png>)
 
 ### grpc服务方法类型
 
