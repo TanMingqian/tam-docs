@@ -22,7 +22,7 @@
 * [golang基础](golang/golang-ji-chu/README.md)
   * [并发](golang/golang-ji-chu/bing-fa.md)
   * [接口](golang/golang-ji-chu/jie-kou.md)
-  * [函数&方法](golang/golang-ji-chu/han-shu-fang-fa/README.md)
+  * [函数&方法](golang/golang-ji-chu/han-shu-fang-fa.md)
     * [defer](golang/golang-ji-chu/han-shu-fang-fa/defer.md)
   * [反射](golang/golang-ji-chu/fan-she.md)
   * [数组&切片](golang/golang-ji-chu/shu-zu-qie-pian.md)
