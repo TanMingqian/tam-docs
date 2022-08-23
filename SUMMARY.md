@@ -56,6 +56,7 @@
   * [kratos-layout](golang/kratos-kuang-jia/kratos-layout.md)
   * [依赖注入](golang/kratos-kuang-jia/yi-lai-zhu-ru.md)
   * [服务注册&发现](golang/kratos-kuang-jia/fu-wu-zhu-ce-fa-xian.md)
+  * [grpc](golang/kratos-kuang-jia/grpc.md)
 * [grpc](golang/grpc.md)
 * [链路跟踪](golang/lian-lu-gen-zong.md)
 

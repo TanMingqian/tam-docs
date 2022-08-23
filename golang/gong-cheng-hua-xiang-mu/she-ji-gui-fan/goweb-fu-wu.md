@@ -136,7 +136,7 @@ v2 := router.Group("/v2", gin.BasicAuth(gin.Accounts{"foo": "bar", "colin": "col
 
 **gin.BasicAuth()**：HTTP 请求基本认证（使用用户名和密码进行认证）
 
-![](<../../../.gitbook/assets/image (3).png>)
+![](<../../../.gitbook/assets/image (3) (2).png>)
 
 ### 认证、RequestID、跨域
 
