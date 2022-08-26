@@ -57,7 +57,8 @@
   * [依赖注入](golang/kratos-kuang-jia/yi-lai-zhu-ru.md)
   * [服务注册&发现](golang/kratos-kuang-jia/fu-wu-zhu-ce-fa-xian.md)
   * [grpc](golang/kratos-kuang-jia/grpc.md)
-* [grpc](golang/grpc.md)
+* [grpc](golang/grpc/README.md)
+  * [gRPC通信模式](golang/grpc/grpc-tong-xin-mo-shi.md)
 * [链路跟踪](golang/lian-lu-gen-zong.md)
 
 ## DOCKER
