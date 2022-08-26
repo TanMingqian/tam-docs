@@ -69,7 +69,7 @@
 
 * [DevOps理论](devops/devops-li-lun.md)
 * [Jenkins](devops/jenkins.md)
-* [DevOps研究报告](devops/devops-yan-jiu-bao-gao.md)
+* [DevOps调研报告](devops/devops-tiao-yan-bao-gao.md)
 
 ## CLOUD-NATIVE
 
