@@ -16,7 +16,7 @@
 
 ## 高效项目管理
 
-![](<../../.gitbook/assets/image (8).png>)
+![](<../../.gitbook/assets/image (8) (1).png>)
 
 ## 编写高质量项目文档
 
