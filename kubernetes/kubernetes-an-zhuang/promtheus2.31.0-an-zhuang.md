@@ -11,7 +11,8 @@ https://cr.console.aliyun.com/cn-hangzhou/instances/repositories&#x20;
 
 
 <pre class="language-shell"><code class="lang-shell">##1、创建kube-ops命名空间 
-<strong>Kubectl create ns kube-ops</strong></code></pre>
+<strong>Kubectl create ns kube-ops
+</strong></code></pre>
 
 ```yaml
 ##2、创建rbac
@@ -81,6 +82,7 @@ data:
              scrape_interval: 5s
              static_configs:
               - targets: ['localhost:9090']
+
 
 </code></pre>
 

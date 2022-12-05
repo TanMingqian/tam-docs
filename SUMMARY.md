@@ -16,7 +16,8 @@
 * [Client-go](kubernetes/client-go.md)
 * [Kustomize](kubernetes/kustomize.md)
 * [Helm](kubernetes/helm.md)
-* [leader选举机制](kubernetes/leader-xuan-ju-ji-zhi.md)
+* [leader选举机制](kubernetes/leader-xuan-ju-ji-zhi/README.md)
+  * [Etcd选主](kubernetes/leader-xuan-ju-ji-zhi/etcd-xuan-zhu.md)
 
 ## GOLANG
 
