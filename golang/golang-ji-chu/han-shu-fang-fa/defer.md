@@ -6,7 +6,7 @@ defer 关键字后面只能接函数（或方法），这些函数被称为 defe
 
 defer 将它们注册到其所在 Goroutine 中，用于存放 deferred 函数的栈数据结构中，这些 deferred 函数将在执行 defer 的函数退出前，按后进先出（LIFO）的顺序被程序调度执行
 
-![](<../../../.gitbook/assets/image (4).png>)
+![](<../../../.gitbook/assets/image (4) (3).png>)
 
 defer 关键字后面的表达式，是在将 deferred 函数注册到 deferred 函数栈的时候进行求值的​
 
