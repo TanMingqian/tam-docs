@@ -8,7 +8,7 @@
 
 ### 支持不同的日志级别
 
-![](<../../../.gitbook/assets/image (1) (2) (1).png>)
+![](<../../../.gitbook/assets/image (1) (2).png>)
 
 ### 支持自定义配置
 
@@ -70,7 +70,7 @@ Go 应用程序会大量使用 Go 语言的并发特性，也就意味着需要�
 
 ### 在哪个日志级别打印日志？
 
-![](<../../../.gitbook/assets/image (2).png>)
+![](<../../../.gitbook/assets/image (2) (1).png>)
 
 #### Debug 级别&#x20;
 

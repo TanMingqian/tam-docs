@@ -83,7 +83,7 @@ Fixes #<issue number>
 
 git rebase -i 使用 git rebase 命令，-i 参数表示交互（interactive），该命令会进入到一个交互界面中
 
-![](<../../../.gitbook/assets/image (7) (2).png>)
+![](<../../../.gitbook/assets/image (7) (2) (1).png>)
 
 ### 修改 Commit Message
 

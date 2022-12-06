@@ -122,7 +122,7 @@ v2 := router.Group("/v2", gin.BasicAuth(gin.Accounts{"foo": "bar", "colin": "col
 
 ### 中间件
 
-![](<../../../.gitbook/assets/image (7).png>)
+![](<../../../.gitbook/assets/image (7) (2).png>)
 
 在 Gin 中，可以通过 gin.Engine 的 Use 方法来加载中间件。
 
