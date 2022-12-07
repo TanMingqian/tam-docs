@@ -42,9 +42,15 @@ Leader，集群领导者， 唯一性，拥有同步日志的特权，需定时�
 
 
 
-以下分析记录etcd  release-3.5
+### 任期term
+
+Raft 协议将时间划分成一个个**任期（Term）**，任期用连续的整数表示，每个任期从一次选举开始，赢得选举的节点在该任期内充当 Leader 的职责，随着时间的消逝，集群可能会发生新的选举，任期号也会单调递增。
+
+通过任期号，可以比较各个节点的数据新旧、识别过期的 Leader 等，**它在 Raft 算法中充当逻辑时钟**，发挥着重要作用。
 
 ### 节点初始化
+
+以下分析记录etcd  release-3.5
 
 <pre class="language-go"><code class="lang-go"><strong>// raft/raft.go 318行
 </strong><strong>func newRaft(c *Config) *raft {
@@ -307,6 +313,60 @@ follower 切换成为 candidate 调用了 `r.reset(r.Term + 1)`，把 term +1 �
 而在预选中切换成 PreCandidate 则没有，只是在发送消息的时候，PreCandidate 把消息中的 term +1 而已(没有修改自身状态，只修改消息的Term任期，发起预选)
 
 通过将各个节点**超时时间随机化**，来避免同时开启选举，然后瓜分选票，最终一直无法选出 Leader 的情况。
+
+### 节点投票逻辑
+
+Follower C节点收到 B节点竞选 Leader 消息后，这时候可能会出现如下两种情况：
+
+* 1） C 节点判断 B 节点的数据至少和自己一样新、B 节点任期号大于 C 当前任期号、并且 C 未投票给其他候选者，就可投票给 B。这时 B 节点获得了集群多数节点支持，于是成为了新的 Leader。
+* 2）恰好 C 也心跳超时超过竞选时间了，它也发起了选举，并投票给了自己，那么它将拒绝投票给 B，这时谁也无法获取集群多数派支持，只能等待竞选超时，开启新一轮选举。
+
+```go
+//raft/raft.go 841
+func (r *raft) Step(m pb.Message) error {
+   switch m.Type {
+   case pb.MsgHup:
+      if r.preVote {
+         r.hup(campaignPreElection)
+      } else {
+         r.hup(campaignElection)
+      }
+
+   case pb.MsgVote, pb.MsgPreVote:
+      // We can vote if this is a repeat of a vote we've already cast...
+      // 是否可以投票（未投票
+      canVote := r.Vote == m.From ||
+         // ...we haven't voted and we don't think there's a leader yet in this term...
+         (r.Vote == None && r.lead == None) ||
+         // ...or this is a PreVote for a future term...
+         (m.Type == pb.MsgPreVote && m.Term > r.Term)
+      // ...and we believe the candidate is up to date.
+      // 判断任期号是否大于自身节点的任期号
+      if canVote && r.raftLog.isUpToDate(m.Index, m.LogTerm) {
+         r.logger.Infof("%x [logterm: %d, index: %d, vote: %x] cast %s for %x [logterm: %d, index: %d] at term %d",
+            r.id, r.raftLog.lastTerm(), r.raftLog.lastIndex(), r.Vote, m.Type, m.From, m.LogTerm, m.Index, r.Term)
+         r.send(pb.Message{To: m.From, Term: m.Term, Type: voteRespMsgType(m.Type)})
+         if m.Type == pb.MsgVote {
+            // Only record real votes.
+            r.electionElapsed = 0
+            r.Vote = m.From
+         }
+      } else {
+         r.logger.Infof("%x [logterm: %d, index: %d, vote: %x] rejected %s from %x [logterm: %d, index: %d] at term %d",
+            r.id, r.raftLog.lastTerm(), r.raftLog.lastIndex(), r.Vote, m.Type, m.From, m.LogTerm, m.Index, r.Term)
+         r.send(pb.Message{To: m.From, Term: r.Term, Type: voteRespMsgType(m.Type), Reject: true})
+      }
+   }
+   return nil
+}
+
+// 判断任期号是否大于自身节点的任期号或最新index大于本身节点的index
+// 是则投票给该节点
+func (l *raftLog) isUpToDate(lasti, term uint64) bool {
+	return term > l.lastTerm() || (term == l.lastTerm() && lasti >= l.lastIndex())
+}
+
+```
 
 ### 投票结果处理 <a href="#5-tou-piao-jie-guo-chu-li" id="5-tou-piao-jie-guo-chu-li"></a>
 
