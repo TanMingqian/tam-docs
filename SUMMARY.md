@@ -17,6 +17,7 @@
 * [Kustomize](kubernetes/kustomize.md)
 * [Helm](kubernetes/helm.md)
 * [leader选举机制](kubernetes/leader-xuan-ju-ji-zhi/README.md)
+  * [Rancher 选主](kubernetes/leader-xuan-ju-ji-zhi/rancher-xuan-zhu.md)
   * [Controller Manager & Scheduler选主](kubernetes/leader-xuan-ju-ji-zhi/controller-manager-scheduler-xuan-zhu.md)
   * [Etcd选主](kubernetes/leader-xuan-ju-ji-zhi/etcd-xuan-zhu.md)
 
