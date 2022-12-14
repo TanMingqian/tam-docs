@@ -30,7 +30,7 @@
 
 源码分析自 kubernetes 1.17 &#x20;
 
-controller-manager组件初始化逻辑
+#### controller-manager组件初始化逻辑
 
 ```go
 // cmd/kube-controller-manager/app/options/options.go 392
@@ -81,7 +81,7 @@ func (s KubeControllerManagerOptions) Config(allControllers []string, disabledBy
 }
 ```
 
-controller-manager 运行逻辑
+#### controller-manager 运行逻辑
 
 调用`leaderelection.RunOrDie` 执行选举逻辑
 
@@ -159,7 +159,7 @@ func Run(c *config.CompletedConfig, stopCh <-chan struct{}) error {
 }
 ```
 
-
+#### 创建 LeaderElector 对象，执行Run 方法开始选举
 
 ```go
 // k8s.io/client-go/leaderelection/leaderelection.go 213
@@ -183,9 +183,11 @@ func (le *LeaderElector) Run(ctx context.Context) {
 		runtime.HandleCrash()
 		le.config.Callbacks.OnStoppedLeading()
 	}()
+	//竞争锁资源，只有超时才返回fasle，
 	if !le.acquire(ctx) {
 		return // ctx signalled done
 	}
+	// 获取到锁后，才允许执行controller 启动逻辑
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	go le.config.Callbacks.OnStartedLeading(ctx)
@@ -193,6 +195,203 @@ func (le *LeaderElector) Run(ctx context.Context) {
 }
 ```
 
-\
+#### acquire
 
+使用golang wait库的 wait.JitterUntil方法，在给定间隔和抖动因子范围内周期执行
 
+抖动因子 ---- 如果大于 0.0 间隔时间变为 duration 到 duration + maxFactor \* duration 的随机值
+
+实现定时任务，在给定时间间隔内执行获取资源锁的 func， 除非收到stopCh信号，否则一直循环
+
+```go
+// k8s.io/client-go/leaderelection/leaderelection.go 235
+// acquire loops calling tryAcquireOrRenew and returns true immediately when tryAcquireOrRenew succeeds.
+// Returns false if ctx signals done.
+func (le *LeaderElector) acquire(ctx context.Context) bool {
+   ctx, cancel := context.WithCancel(ctx)
+   defer cancel()
+   succeeded := false
+   desc := le.config.Lock.Describe()
+   klog.Infof("attempting to acquire leader lease  %v...", desc)
+   // 定时任务
+   wait.JitterUntil(func() {
+      // 获取资源锁
+      succeeded = le.tryAcquireOrRenew()
+      le.maybeReportTransition()
+      // 抢占锁失败则直接返回，等待下个周期
+      if !succeeded {
+         klog.V(4).Infof("failed to acquire lease %v", desc)
+         return
+      }
+      le.config.Lock.RecordEvent("became leader")
+      le.metrics.leaderOn(le.config.Name)
+      klog.Infof("successfully acquired lease %v", desc)
+      cancel()
+      // 间隔周期 默认为2s
+      // 抖动因子 如果大于 0.0 间隔时间变为 duration 到 duration + maxFactor * duration 的随机值
+      // siling 逻辑的执行时间是否不算入间隔时间
+   }, le.config.RetryPeriod, JitterFactor, true, ctx.Done())
+   return succeeded
+}
+```
+
+#### tryAcquireOrRenew
+
+tryAcquireOrRenew 函数尝试获取租约，如果获取不到或者得到的租约已过期则尝试抢占，否则 leader 不变。函数返回 True 说明本 goroutine 已成功抢占到锁，获得租约合同，成为 leader。
+
+<pre class="language-go"><code class="lang-go">// k8s.io/client-go/leaderelection/leaderelection.go 322
+<strong>// tryAcquireOrRenew tries to acquire a leader lease if it is not already acquired,
+</strong>// else it tries to renew the lease if it has already been acquired. Returns true
+// on success else returns false.
+func (le *LeaderElector) tryAcquireOrRenew() bool {
+   now := metav1.Now()
+   leaderElectionRecord := rl.LeaderElectionRecord{
+      HolderIdentity:       le.config.Lock.Identity(),
+      LeaseDurationSeconds: int(le.config.LeaseDuration / time.Second),
+      RenewTime:            now,
+      AcquireTime:          now,
+   }
+
+   // 1. obtain or create the ElectionRecord
+   // le.config.Lock.Get()通过client-go 获取k8s resource状态（从etcd获取）
+   oldLeaderElectionRecord, oldLeaderElectionRawRecord, err := le.config.Lock.Get()
+   if err != nil {
+      if !errors.IsNotFound(err) {
+         klog.Errorf("error retrieving resource lock %v: %v", le.config.Lock.Describe(), err)
+         return false
+      }
+      if err = le.config.Lock.Create(leaderElectionRecord); err != nil {
+         klog.Errorf("error initially creating leader election record: %v", err)
+         return false
+      }
+      le.observedRecord = leaderElectionRecord
+      le.observedTime = le.clock.Now()
+      return true
+   }
+
+   // 2. Record obtained, check the Identity &#x26; Time
+   // 校验租约是否到期
+   if !bytes.Equal(le.observedRawRecord, oldLeaderElectionRawRecord) {
+      le.observedRecord = *oldLeaderElectionRecord
+      le.observedRawRecord = oldLeaderElectionRawRecord
+      le.observedTime = le.clock.Now()
+   }
+   if len(oldLeaderElectionRecord.HolderIdentity) > 0 &#x26;&#x26;
+      le.observedTime.Add(le.config.LeaseDuration).After(now.Time) &#x26;&#x26;
+      !le.IsLeader() {
+      klog.V(4).Infof("lock is held by %v and has not yet expired", oldLeaderElectionRecord.HolderIdentity)
+      return false
+   }
+
+   // 3. We're going to try to update. The leaderElectionRecord is set to it's default
+   // here. Let's correct it before updating.
+   if le.IsLeader() {
+      leaderElectionRecord.AcquireTime = oldLeaderElectionRecord.AcquireTime
+      leaderElectionRecord.LeaderTransitions = oldLeaderElectionRecord.LeaderTransitions
+   } else {
+      leaderElectionRecord.LeaderTransitions = oldLeaderElectionRecord.LeaderTransitions + 1
+   }
+
+   // update the lock itself
+   // 更新资源锁
+   if err = le.config.Lock.Update(leaderElectionRecord); err != nil {
+      klog.Errorf("Failed to update lock: %v", err)
+      return false
+   }
+
+   le.observedRecord = leaderElectionRecord
+   le.observedTime = le.clock.Now()
+   return true
+}
+</code></pre>
+
+#### le.config.Lock
+
+资源锁接口
+
+接口实现包括 EndpointLock 和 ConfigMapLock
+
+具体实现代码在// k8s.io/client-go/leaderelection/resourcelock 包内
+
+创建和更新资源锁，会在configmap或endpoint的annotation 更新 "control-plane.alpha.kubernetes.io/leader" 字段
+
+```go
+// Interface offers a common interface for locking on arbitrary
+// resources used in leader election.  The Interface is used
+// to hide the details on specific implementations in order to allow
+// them to change over time.  This interface is strictly for use
+// by the leaderelection code.
+type Interface interface {
+   // Get returns the LeaderElectionRecord
+   Get() (*LeaderElectionRecord, []byte, error)
+
+   // Create attempts to create a LeaderElectionRecord
+   Create(ler LeaderElectionRecord) error
+
+   // Update will update and existing LeaderElectionRecord
+   Update(ler LeaderElectionRecord) error
+
+   // RecordEvent is used to record events
+   RecordEvent(string)
+
+   // Identity will return the locks Identity
+   Identity() string
+
+   // Describe is used to convert details on current resource lock
+   // into a string
+   Describe() string
+}
+```
+
+#### renew
+
+获取到资源锁，成为leader之后，leader通过renew方法来更新租约，维持自身的leader状态
+
+使用wait.Until 定时执行，没有抖动随机因子，因此leader 更新租约的间隔 < 节点获取锁的间隔，保证leader在正常情况下持续更新租约维持leader状态
+
+```go
+// k8s.io/client-go/leaderelection/leaderelection.go 259
+// renew loops calling tryAcquireOrRenew and returns immediately when tryAcquireOrRenew fails or ctx signals done.
+func (le *LeaderElector) renew(ctx context.Context) {
+   ctx, cancel := context.WithCancel(ctx)
+   defer cancel()
+   // 周期执行renew
+   wait.Until(func() {
+      // 设置renew context 超时时间
+      timeoutCtx, timeoutCancel := context.WithTimeout(ctx, le.config.RenewDeadline)
+      defer timeoutCancel()
+      // 在超时时间范围内周期执行 更新租约
+      err := wait.PollImmediateUntil(le.config.RetryPeriod, func() (bool, error) {
+         done := make(chan bool, 1)
+         go func() {
+            defer close(done)
+            // 尝试更新租约
+            done <- le.tryAcquireOrRenew()
+         }()
+
+         select {
+         case <-timeoutCtx.Done():
+            return false, fmt.Errorf("failed to tryAcquireOrRenew %s", timeoutCtx.Err())
+         case result := <-done:
+            return result, nil
+         }
+      }, timeoutCtx.Done())
+
+      le.maybeReportTransition()
+      desc := le.config.Lock.Describe()
+      if err == nil {
+         klog.V(5).Infof("successfully renewed lease %v", desc)
+         return
+      }
+      le.config.Lock.RecordEvent("stopped leading")
+      le.metrics.leaderOff(le.config.Name)
+      klog.Infof("failed to renew lease %v: %v", desc, err)
+      cancel()
+   }, le.config.RetryPeriod, ctx.Done())
+
+   // if we hold the lease, give it up
+   if le.config.ReleaseOnCancel {
+      le.release()
+   }
+}
+```
