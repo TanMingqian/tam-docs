@@ -20,11 +20,15 @@
 
 ## 选举的逻辑
 
-所有节点上的组件请求各自apiserver，apiserver从etcd中抢占锁资源，抢到锁的节点组件会将自己标记成为锁的持有者。
+kube-controller-manager和 kube-scheduler 都是依赖etcd实现分布式锁从而实现leader选举
+
+所有节点上的组件请求各自apiserver，apiserver从etcd中抢占锁资源（configmap或endpoint或lease），抢到锁的节点组件会将自己标记成为锁的持有者。
 
 &#x20;leader 则可以通过更新RenewTime来确保持续保有该锁。同时其它节点上的组件也会请求各节点上的apiserver，来查询加锁对象的更新时间来判断自己是否成为新的leader。
 
 当leader在配置的时间内未能成功更新锁资源的时间，立即会失去leader身份
+
+<figure><img src="../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
 
 ### 核心逻辑
 
@@ -246,7 +250,9 @@ tryAcquireOrRenew 函数尝试获取租约，如果获取不到或者得到的�
 func (le *LeaderElector) tryAcquireOrRenew() bool {
    now := metav1.Now()
    leaderElectionRecord := rl.LeaderElectionRecord{
+      // 锁持有者（leader）身份标识
       HolderIdentity:       le.config.Lock.Identity(),
+      // 租约时长
       LeaseDurationSeconds: int(le.config.LeaseDuration / time.Second),
       RenewTime:            now,
       AcquireTime:          now,
@@ -311,7 +317,7 @@ func (le *LeaderElector) tryAcquireOrRenew() bool {
 
 接口实现包括 EndpointLock 和 ConfigMapLock
 
-具体实现代码在// k8s.io/client-go/leaderelection/resourcelock 包内
+具体实现代码在k8s.io/client-go/leaderelection/resourcelock 包内
 
 创建和更新资源锁，会在configmap或endpoint的annotation 更新 "control-plane.alpha.kubernetes.io/leader" 字段
 
