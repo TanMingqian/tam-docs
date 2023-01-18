@@ -66,6 +66,6 @@ Protocol Buffers 的主要特性有下面这几个&#x20;
 
 ### RESTful VS gRPC
 
-![](<../../../.gitbook/assets/image (20).png>)
+![](<../../../.gitbook/assets/image (20) (1).png>)
 
 ![](<../../../.gitbook/assets/image (12).png>)
