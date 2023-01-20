@@ -13,7 +13,7 @@
   * [Helm安装](kubernetes/kubernetes-an-zhuang/helm-an-zhuang.md)
   * [常见问题积累](kubernetes/kubernetes-an-zhuang/chang-jian-wen-ti-ji-lei.md)
 * [Kubernetes 原理](kubernetes/kubernetes-yuan-li.md)
-* [Client-go](kubernetes/client-go/README.md)
+* [Client-go](kubernetes/client-go.md)
   * [informer初始化](kubernetes/client-go/informer-chu-shi-hua.md)
 * [Kustomize](kubernetes/kustomize.md)
 * [Helm](kubernetes/helm.md)

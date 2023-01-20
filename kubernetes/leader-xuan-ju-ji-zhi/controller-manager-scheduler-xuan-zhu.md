@@ -28,7 +28,7 @@ kube-controller-manager和 kube-scheduler 都是依赖etcd实现分布式锁从�
 
 当leader在配置的时间内未能成功更新锁资源的时间，立即会失去leader身份
 
-<figure><img src="../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (14).png" alt=""><figcaption></figcaption></figure>
 
 ### 核心逻辑
 

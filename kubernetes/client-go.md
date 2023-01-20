@@ -1,6 +1,6 @@
 # Client-go
 
-<figure><img src="../../.gitbook/assets/image (20).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
 
 从图中可以看出，k8s informer主要包括以下几个部分：
 
@@ -44,4 +44,4 @@ indexers，indices：索引
 
 
 
-<figure><img src="../../.gitbook/assets/image (7).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>

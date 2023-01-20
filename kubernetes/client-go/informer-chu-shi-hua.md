@@ -368,3 +368,92 @@ func (c *controller) Run(stopCh <-chan struct{}) {
 }
 ```
 
+processLoop循环调用c.config.Queue.Pop将DeltaFIFO中的队头元素给pop出来（实际上pop出来的是Deltas，是Delta的切片类型），然后用`c.config.Process`方法来做处理Deltas，c.config.Process就是s.HandleDeltas
+
+```go
+func (c *controller) processLoop() {
+   for {
+      obj, err := c.config.Queue.Pop(PopProcessFunc(c.config.Process))
+      if err != nil {
+         if err == ErrFIFOClosed {
+            return
+         }
+         if c.config.RetryOnError {
+            // This is the safe way to re-enqueue.
+            c.config.Queue.AddIfNotPresent(obj)
+         }
+      }
+   }
+}
+```
+
+c.config.Process即为s.HandleDeltas方法
+
+HandleDeltas方法的主要逻辑：\
+（1）循环遍历Deltas，拿到单个Delta；\
+（2）判断Delta的类型；\
+（3）如果是Added、Updated、Sync类型，则从indexer中获取该对象，存在则调用s.indexer.Update来更新indexer中的该对象，随后构造updateNotification struct，并调用s.processor.distribute方法；如果indexer中不存在该对象，则调用s.indexer.Add来往indexer中添加该对象，随后构造addNotification struct，并调用s.processor.distribute方法；\
+（4）如果是Deleted类型，则调用s.indexer.Delete来将indexer中的该对象删除，随后构造deleteNotification struct，并调用s.processor.distribute方法；
+
+<pre class="language-go"><code class="lang-go"><strong>//k8s.io/client-go/tools/cache/shared_informer.go
+</strong><strong>func (s *sharedIndexInformer) HandleDeltas(obj interface{}) error {
+</strong>   s.blockDeltas.Lock()
+   defer s.blockDeltas.Unlock()
+   // 判断Deltas类型
+   if deltas, ok := obj.(Deltas); ok {
+      return processDeltas(s, s.indexer, s.transform, deltas)
+   }
+   return errors.New("object given as Process argument is not Deltas")
+}
+
+//k8s.io/client-go/tools/cache/controller.go
+// Multiplexes updates in the form of a list of Deltas into a Store, and informs
+// a given handler of events OnUpdate, OnAdd, OnDelete
+func processDeltas(
+	// Object which receives event notifications from the given deltas
+	handler ResourceEventHandler,
+	clientState Store,
+	transformer TransformFunc,
+	deltas Deltas,
+) error {
+	// from oldest to newest
+	for _, d := range deltas {
+		obj := d.Object
+		if transformer != nil {
+			var err error
+			obj, err = transformer(obj)
+			if err != nil {
+				return err
+			}
+		}
+
+		switch d.Type {
+		case Sync, Replaced, Added, Updated:
+			if old, exists, err := clientState.Get(obj); err == nil &#x26;&#x26; exists {
+				if err := clientState.Update(obj); err != nil {
+					return err
+				}
+				// 构造updateNotification struct
+				handler.OnUpdate(old, obj)
+			} else {
+				if err := clientState.Add(obj); err != nil {
+					return err
+				}
+				// 构造 updateNotifaction sturct
+				handler.OnAdd(obj)
+			}
+		case Deleted:
+			// indexer 删除 obj
+			if err := clientState.Delete(obj); err != nil {
+				return err
+			}
+			// 构造 deleteNotifaction sturct
+			handler.OnDelete(obj)
+		}
+	}
+	return nil
+}
+</code></pre>
+
+
+

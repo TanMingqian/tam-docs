@@ -34,7 +34,7 @@ go install github.com/go-swagger/go-swagger/cmd/swagger
 
 go-swagger 通过解析源码中的注释来生成 Swagger 文档
 
-![](<../../../.gitbook/assets/image (14).png>)
+![](<../../../.gitbook/assets/image (14) (2).png>)
 
 
 
