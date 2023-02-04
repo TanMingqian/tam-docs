@@ -226,12 +226,12 @@ ListAndWatch的主要逻辑分为三大块：
 // It returns error if ListAndWatch didn't even try to initialize watch.
 func (r *Reflector) ListAndWatch(stopCh <-chan struct{}) error {
    klog.V(3).Infof("Listing and watching %v from %s", r.expectedTypeName, r.name)
-
+   // 调用list方法，获取全量的资源对象
    err := r.list(stopCh)
    if err != nil {
       return err
    }
-
+   // Resync操作，隔一段时间执行一次
    resyncerrc := make(chan error, 1)
    cancelCh := make(chan struct{})
    defer close(cancelCh)
@@ -248,8 +248,10 @@ func (r *Reflector) ListAndWatch(stopCh <-chan struct{}) error {
          case <-cancelCh:
             return
          }
+         // 是否需要执行Resync操作，重新同步
          if r.ShouldResync == nil || r.ShouldResync() {
             klog.V(4).Infof("%s: forcing resync", r.name)
+            // 调用r.store.Resync操作DeltaFIFO
             if err := r.store.Resync(); err != nil {
                resyncerrc <- err
                return
@@ -259,7 +261,7 @@ func (r *Reflector) ListAndWatch(stopCh <-chan struct{}) error {
          resyncCh, cleanup = r.resyncChan()
       }
    }()
-
+   // watch操作
    retry := NewRetryWithDeadline(r.MaxInternalErrorRetryDuration, time.Minute, apierrors.IsInternalError, r.clock)
    for {
       // give the stopCh a chance to stop the loop, even in case of continue statements further down on errors
@@ -283,6 +285,7 @@ func (r *Reflector) ListAndWatch(stopCh <-chan struct{}) error {
 
       // start the clock before sending the request, since some proxies won't flush headers until after the first watch event is sent
       start := r.clock.Now()
+      // 调用r.listerWatcher.Watch 开始监听资源对象
       w, err := r.listerWatcher.Watch(options)
       if err != nil {
          // If this is "connection refused" error, it means that most likely apiserver is not responsive.
@@ -296,7 +299,7 @@ func (r *Reflector) ListAndWatch(stopCh <-chan struct{}) error {
          }
          return err
       }
-
+      // 调用r.watchHandler,处理watch操作返回的channel，操作DeltaFIFO
       err = watchHandler(start, w, r.store, r.expectedType, r.expectedGVK, r.name, r.expectedTypeName, r.setLastSyncResourceVersion, r.clock, resyncerrc, stopCh)
       retry.After(err)
       if err != nil {
@@ -324,6 +327,110 @@ func (r *Reflector) ListAndWatch(stopCh <-chan struct{}) error {
 }
 ```
 
-\
+## watchHandler
 
+r.watchHandler主要是处理watch操作返回来的结果，其主要逻辑为循环做以下操作，直至event事件处理完毕：&#x20;
+
+（1）从watch操作返回来的chan中获取event事件；&#x20;
+
+（2）chan关闭则退出loop；&#x20;
+
+（3）区分watch.Added、watch.Modified、watch.Deleted三种类型的event事件，分别调用r.store.Add、r.store.Update、r.store.Delete做处理，具体关于r.store.xxx的方法分析，在后续对DeltaFIFO进行分析时再做具体的分析；&#x20;
+
+（4）调用setLastSyncResourceVersion，为Reflector更新已被处理的最新资源对象的resourceVersion值；
+
+```go
+// watchHandler watches w and sets setLastSyncResourceVersion
+func watchHandler(start time.Time,
+   w watch.Interface,
+   store Store,
+   expectedType reflect.Type,
+   expectedGVK *schema.GroupVersionKind,
+   name string,
+   expectedTypeName string,
+   setLastSyncResourceVersion func(string),
+   clock clock.Clock,
+   errc chan error,
+   stopCh <-chan struct{},
+) error {
+   eventCount := 0
+
+   // Stopping the watcher should be idempotent and if we return from this function there's no way
+   // we're coming back in with the same watch interface.
+   defer w.Stop()
+
+loop:
+   for {
+      select {
+      case <-stopCh:
+         return errorStopRequested
+      case err := <-errc:
+         return err
+      case event, ok := <-w.ResultChan():
+         if !ok {
+            break loop
+         }
+         if event.Type == watch.Error {
+            return apierrors.FromObject(event.Object)
+         }
+         if expectedType != nil {
+            if e, a := expectedType, reflect.TypeOf(event.Object); e != a {
+               utilruntime.HandleError(fmt.Errorf("%s: expected type %v, but watch event object had type %v", name, e, a))
+               continue
+            }
+         }
+         if expectedGVK != nil {
+            if e, a := *expectedGVK, event.Object.GetObjectKind().GroupVersionKind(); e != a {
+               utilruntime.HandleError(fmt.Errorf("%s: expected gvk %v, but watch event object had gvk %v", name, e, a))
+               continue
+            }
+         }
+         meta, err := meta.Accessor(event.Object)
+         if err != nil {
+            utilruntime.HandleError(fmt.Errorf("%s: unable to understand watch event %#v", name, event))
+            continue
+         }
+         resourceVersion := meta.GetResourceVersion()
+         // 根据watch channel里的事件类型，更新本地缓存（DeltaFIFO）
+         switch event.Type {
+         case watch.Added:
+            err := store.Add(event.Object)
+            if err != nil {
+               utilruntime.HandleError(fmt.Errorf("%s: unable to add watch event object (%#v) to store: %v", name, event.Object, err))
+            }
+         case watch.Modified:
+            err := store.Update(event.Object)
+            if err != nil {
+               utilruntime.HandleError(fmt.Errorf("%s: unable to update watch event object (%#v) to store: %v", name, event.Object, err))
+            }
+         case watch.Deleted:
+            // TODO: Will any consumers need access to the "last known
+            // state", which is passed in event.Object? If so, may need
+            // to change this.
+            err := store.Delete(event.Object)
+            if err != nil {
+               utilruntime.HandleError(fmt.Errorf("%s: unable to delete watch event object (%#v) from store: %v", name, event.Object, err))
+            }
+         case watch.Bookmark:
+            // A `Bookmark` means watch has synced here, just update the resourceVersion
+         default:
+            utilruntime.HandleError(fmt.Errorf("%s: unable to understand watch event %#v", name, event))
+         }
+         更新RV值
+         setLastSyncResourceVersion(resourceVersion)
+         if rvu, ok := store.(ResourceVersionUpdater); ok {
+            rvu.UpdateResourceVersion(resourceVersion)
+         }
+         eventCount++
+      }
+   }
+
+   watchDuration := clock.Since(start)
+   if watchDuration < 1*time.Second && eventCount == 0 {
+      return fmt.Errorf("very short watch: %s: Unexpected watch close - watch lasted less than a second and no items received", name)
+   }
+   klog.V(4).Infof("%s: Watch close - %v total %v items received", name, expectedTypeName, eventCount)
+   return nil
+}
+```
 

@@ -16,6 +16,7 @@
 * [Client-go](kubernetes/client-go.md)
   * [informer初始化](kubernetes/client-go/informer-chu-shi-hua.md)
   * [Reflector](kubernetes/client-go/reflector.md)
+  * [DeltaFIFO](kubernetes/client-go/deltafifo.md)
 * [Kustomize](kubernetes/kustomize.md)
 * [Helm](kubernetes/helm.md)
 * [leader选举机制](kubernetes/leader-xuan-ju-ji-zhi/README.md)
