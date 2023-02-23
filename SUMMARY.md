@@ -23,6 +23,8 @@
   * [Rancher 选主](kubernetes/leader-xuan-ju-ji-zhi/rancher-xuan-zhu.md)
   * [Controller Manager & Scheduler选主](kubernetes/leader-xuan-ju-ji-zhi/controller-manager-scheduler-xuan-zhu.md)
   * [Etcd选主](kubernetes/leader-xuan-ju-ji-zhi/etcd-xuan-zhu.md)
+* [Kubernetes 源码分析](kubernetes/kubernetes-yuan-ma-fen-xi/README.md)
+  * [SelectorSpreadPriority](kubernetes/kubernetes-yuan-ma-fen-xi/selectorspreadpriority.md)
 
 ## GOLANG
 
