@@ -6,19 +6,19 @@
 
 ### 单点故障
 
-为了解决单点问题，软件系统工程师引入了数据复制技术，实现多副本。通过数据复制方案，一方面我们可以提高服务可用性，避免单点故障。
+为了**解决单点问题**，软件系统工程师引入了数据复制技术，实现多副本。通过**数据复制**方案，一方面我们可以提高服务可用性，避免单点故障。
 
 另一方面，多副本可以提升读吞吐量、甚至就近部署在业务所在的地理位置，降低访问延迟。
 
 ### 多副本复制
 
-多副本常用的技术方案主要有主从复制和去中心化复制。主从复制，又分为全同步复制、异步复制、半同步复制，比如 MySQL/Redis 单机主备版就基于主从复制实现的。
+多副本常用的技术方案主要有**主从复制和去中心化复制**。主从复制，又分为全同步复制、异步复制、半同步复制，比如 MySQL/Redis 单机主备版就基于主从复制实现的。
 
-跟主从复制相反的就是去中心化复制，它是指在一个 n 副本节点集群中，任意节点都可接受写请求，但一个成功的写入需要 w 个节点确认，读取也必须查询至少 r 个节点。
+跟主从复制相反的就是去中心化复制，它是指在**一个 n 副本节点集群中，任意节点都可接受写请求，但一个成功的写入需要 w 个节点确认，读取也必须查询至少 r 个节点**。
 
 ### etcd写请求
 
-Raft 模块收到提案后，如果当前节点是 Follower，它会转发给 Leader，只有 Leader 才能处理写请求
+Raft 模块收到提案后，如果当前节点是 Follower，它会转发给 Leader，**只有 Leader 才能处理写请求**
 
 etcdserver 从 Raft 模块获取到提案Propose后，作为 Leader，它会将 put 提案消息广播给集群各个节点，同时需要把集群 Leader 任期号、投票信息、已提交索引、提案内容持久化到一个 WAL（Write Ahead Log）日志文件中，用于保证集群的一致性、可恢复性
 
@@ -34,11 +34,11 @@ follower接收到leader的消息后，同时也更新WAL日志文件，更新完
 
 在raft中，任何节点都处于以下三种状态之一：
 
-Follower，跟随者， 同步从 Leader 收到的日志，etcd 启动的时候默认为此状态；
+**Follower**，跟随者， 同步从 Leader 收到的日志，etcd 启动的时候默认为此状态；
 
-Candidate，竞选者，可以发起 Leader 选举；
+**Candidate**，竞选者，可以发起 Leader 选举；
 
-Leader，集群领导者， 唯一性，拥有同步日志的特权，需定时广播心跳给 Follower 节点，以维持领导者身份。
+**Leader**，集群领导者， 唯一性，拥有同步日志的特权，需定时广播心跳给 Follower 节点，以维持领导者身份。
 
 <figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
@@ -112,7 +112,7 @@ Raft 协议将时间划分成一个个**任期（Term）**，任期用连续的�
 
 根据配置文件，初始化一个raft对象，同步持久化数据
 
-调用 r.becomeFollower(r.Term, None)，即所有节点启动时均为follower状态
+调用 r.becomeFollower(r.Term, None)，**即所有节点启动时均为follower状态**
 
 <pre class="language-go"><code class="lang-go"><strong>// raft/raft.go 680行
 </strong><strong>func (r *raft) becomeFollower(term uint64, lead uint64) {
