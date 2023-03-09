@@ -22,6 +22,8 @@ Raft 模块收到提案后，如果当前节点是 Follower，它会转发给 Le
 
 etcdserver 从 Raft 模块获取到提案Propose后，作为 Leader，它会将 put 提案消息广播给集群各个节点，同时需要把集群 Leader 任期号、投票信息、已提交索引、提案内容持久化到一个 WAL（Write Ahead Log）日志文件中，用于保证集群的一致性、可恢复性
 
+follower接收到leader的消息后，同时也更新WAL日志文件，更新完成后回复leader，当超过半数的follower完成log更新后，leader开始正式写入数据，同时也广播给follower进行数据持久化
+
 <figure><img src="../../.gitbook/assets/image (1) (3).png" alt=""><figcaption></figcaption></figure>
 
 ## Leader 选举
