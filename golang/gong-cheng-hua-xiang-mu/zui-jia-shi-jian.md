@@ -6,7 +6,7 @@
 
 **用“最佳实践”的方式去实现 Go 项目中的 Go 应用、项目管理和项目文档**
 
-![](<../../.gitbook/assets/image (4) (1).png>)
+![](<../../.gitbook/assets/image (4) (1) (1).png>)
 
 
 

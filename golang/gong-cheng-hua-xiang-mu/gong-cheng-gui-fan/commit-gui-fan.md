@@ -4,7 +4,7 @@
 
 ![](<../../../.gitbook/assets/image (18) (1).png>)
 
-![](<../../../.gitbook/assets/image (3) (1).png>)
+![](<../../../.gitbook/assets/image (3) (1) (2).png>)
 
 **在 Angular 规范中，Commit Message 包含三个部分，分别是 Header、Body 和 Footer，格式如下：**
 

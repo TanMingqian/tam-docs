@@ -36,7 +36,7 @@ Go 包可以拥有不止一个 init 函数，每个组成 Go 包的 Go 源文件
 
 ### Go 包的初始化次序
 
-![](<../../../.gitbook/assets/image (3).png>)
+![](<../../../.gitbook/assets/image (3) (1).png>)
 
 **依赖包按“深度优先”的次序进行初始化；**
 

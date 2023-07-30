@@ -30,7 +30,7 @@ go get -u github.com/go-swagger/go-swagger/cmd/swagger
 go install github.com/go-swagger/go-swagger/cmd/swagger
 ```
 
-![](<../../../.gitbook/assets/image (5).png>)
+![](<../../../.gitbook/assets/image (5) (2).png>)
 
 go-swagger 通过解析源码中的注释来生成 Swagger 文档
 

@@ -61,7 +61,7 @@ MAKEFLAGS += --no-print-directory
 
 ### 特殊变量
 
-![](<../../../.gitbook/assets/image (6).png>)
+![](<../../../.gitbook/assets/image (6) (2).png>)
 
 ### 自动化变量
 
