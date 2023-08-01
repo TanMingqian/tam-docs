@@ -4,7 +4,7 @@
 
 [kratos-layout](https://github.com/go-kratos/kratos-layout) 作为使用 `kratos new` 新建项目时所使用结构，其中包括了开发过程中所需的配套工具链( Makefile 等)，便于开发者更高效地维护整个项目，本项目亦可作为使用 Kratos 构建微服务的工程化最佳实践的参考。
 
-<figure><img src="../../.gitbook/assets/image (1) (1) (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1) (3) (1).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://github.com/go-kratos/kratos-layout" %}
 
