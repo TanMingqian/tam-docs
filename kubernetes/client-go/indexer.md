@@ -189,9 +189,7 @@ Indices: {
 
 我们按照命名空间来进行索引，可以简单的理解为这个 Indexer 就是简单的把相同命名空间的对象放在一个集合中，然后基于命名空间来查找对象
 
-\
-Indexer本地缓存
------------
+### &#x20;Indexer本地缓存
 
 前面对informer-Controller的分析中（代码如下），提到的s.indexer.Add、s.indexer.Update、s.indexer.Delete、s.indexer.Get等方法其实最终就是调用的threadSafeMap.Add、threadSafeMap.Update、threadSafeMap.Delete、threadSafeMap.Get等
 
