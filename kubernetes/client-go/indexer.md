@@ -2,7 +2,7 @@
 
 Indexer是资源对象的本地缓存，依赖于threadSafeMap的items，indexers，indices items：items是一个map，本地存储所有资源对象，key为资源对象的namespace/name组成，value为资源对象本身 indexers，indices：索引
 
-<figure><img src="../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Indexer的结构定义分析
 

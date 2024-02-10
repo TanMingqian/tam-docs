@@ -17,6 +17,8 @@
   * [informer初始化](kubernetes/client-go/informer-chu-shi-hua.md)
   * [Reflector](kubernetes/client-go/reflector.md)
   * [DeltaFIFO](kubernetes/client-go/deltafifo.md)
+  * [Controller](kubernetes/client-go/controller.md)
+  * [Processor](kubernetes/client-go/processor.md)
   * [Indexer](kubernetes/client-go/indexer.md)
 * [Kustomize](kubernetes/kustomize.md)
 * [Helm](kubernetes/helm.md)
