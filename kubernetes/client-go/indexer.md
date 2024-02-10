@@ -183,6 +183,12 @@ Indices: {
 
 当items中添加obj时，MetaNamespaceIndexFunc计算出obj的namespace(default)，将obj的key(default/pod-2) 当获取namespace(default)下资源对象时，返回相应key列表，并从items中根据key获取obj
 
+
+
+<figure><img src="../../.gitbook/assets/image (44).png" alt=""><figcaption></figcaption></figure>
+
+我们按照命名空间来进行索引，可以简单的理解为这个 Indexer 就是简单的把相同命名空间的对象放在一个集合中，然后基于命名空间来查找对象
+
 \
 Indexer本地缓存
 -----------
